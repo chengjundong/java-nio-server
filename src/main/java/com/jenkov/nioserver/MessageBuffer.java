@@ -18,9 +18,9 @@ public class MessageBuffer {
     private static final int CAPACITY_LARGE  = 1024 * KB;
 
     //package scope (default) - so they can be accessed from unit tests.
-    byte[]  smallMessageBuffer  = new byte[1024 *   4 * KB];   //1024 x   4KB messages =  4MB.
-    byte[]  mediumMessageBuffer = new byte[128  * 128 * KB];   // 128 x 128KB messages = 16MB.
-    byte[]  largeMessageBuffer  = new byte[16   *   1 * MB];   //  16 *   1MB messages = 16MB.
+    private byte[]  smallMessageBuffer  = new byte[1024 *   4 * KB];   //1024 x   4KB messages =  4MB.
+    private byte[]  mediumMessageBuffer = new byte[128  * 128 * KB];   // 128 x 128KB messages = 16MB.
+    private byte[]  largeMessageBuffer  = new byte[16   *   1 * MB];   //  16 *   1MB messages = 16MB.
 
     QueueIntFlip smallMessageBufferFreeBlocks  = new QueueIntFlip(1024); // 1024 free sections
     QueueIntFlip mediumMessageBufferFreeBlocks = new QueueIntFlip(128);  // 128  free sections
@@ -31,13 +31,13 @@ public class MessageBuffer {
 
     public MessageBuffer() {
         //add all free sections to all free section queues.
-        for(int i=0; i<smallMessageBuffer.length; i+= CAPACITY_SMALL){
+        for(int i=0; i<getSmallMessageBuffer().length; i+= CAPACITY_SMALL){
             this.smallMessageBufferFreeBlocks.put(i);
         }
-        for(int i=0; i<mediumMessageBuffer.length; i+= CAPACITY_MEDIUM){
+        for(int i=0; i<getMediumMessageBuffer().length; i+= CAPACITY_MEDIUM){
             this.mediumMessageBufferFreeBlocks.put(i);
         }
-        for(int i=0; i<largeMessageBuffer.length; i+= CAPACITY_LARGE){
+        for(int i=0; i<getLargeMessageBuffer().length; i+= CAPACITY_LARGE){
             this.largeMessageBufferFreeBlocks.put(i);
         }
     }
@@ -49,7 +49,7 @@ public class MessageBuffer {
 
         Message message = new Message(this);       //todo get from Message pool - caps memory usage.
 
-        message.sharedArray = this.smallMessageBuffer;
+        message.sharedArray = this.getSmallMessageBuffer();
         message.capacity    = CAPACITY_SMALL;
         message.offset      = nextFreeSmallBlock;
         message.length      = 0;
@@ -59,9 +59,9 @@ public class MessageBuffer {
 
     public boolean expandMessage(Message message){
         if(message.capacity == CAPACITY_SMALL){
-            return moveMessage(message, this.smallMessageBufferFreeBlocks, this.mediumMessageBufferFreeBlocks, this.mediumMessageBuffer, CAPACITY_MEDIUM);
+            return moveMessage(message, this.smallMessageBufferFreeBlocks, this.mediumMessageBufferFreeBlocks, this.getMediumMessageBuffer(), CAPACITY_MEDIUM);
         } else if(message.capacity == CAPACITY_MEDIUM){
-            return moveMessage(message, this.mediumMessageBufferFreeBlocks, this.largeMessageBufferFreeBlocks, this.largeMessageBuffer, CAPACITY_LARGE);
+            return moveMessage(message, this.mediumMessageBufferFreeBlocks, this.largeMessageBufferFreeBlocks, this.getLargeMessageBuffer(), CAPACITY_LARGE);
         } else {
             return false;
         }
@@ -80,6 +80,30 @@ public class MessageBuffer {
         message.capacity    = newCapacity;
         return true;
     }
+
+	public byte[] getSmallMessageBuffer() {
+		return smallMessageBuffer;
+	}
+
+	public void setSmallMessageBuffer(byte[] smallMessageBuffer) {
+		this.smallMessageBuffer = smallMessageBuffer;
+	}
+
+	public byte[] getMediumMessageBuffer() {
+		return mediumMessageBuffer;
+	}
+
+	public void setMediumMessageBuffer(byte[] mediumMessageBuffer) {
+		this.mediumMessageBuffer = mediumMessageBuffer;
+	}
+
+	public byte[] getLargeMessageBuffer() {
+		return largeMessageBuffer;
+	}
+
+	public void setLargeMessageBuffer(byte[] largeMessageBuffer) {
+		this.largeMessageBuffer = largeMessageBuffer;
+	}
 
 
 

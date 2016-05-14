@@ -1,15 +1,13 @@
-package com.jenkov.nioserver.http;
+package com.jenkov.nioserver.test.http;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.io.UnsupportedEncodingException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
+import org.junit.Test;
+
+import com.jenkov.nioserver.http.HttpHeaders;
+import com.jenkov.nioserver.http.HttpUtil;
 
 /**
  * Created by jjenkov on 19-10-2015.
